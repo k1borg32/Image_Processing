@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 
-// CImg setup
 #define cimg_display 0
 #define cimg_use_bmp
 #include "CImg.h"
@@ -9,28 +8,22 @@
 using namespace std;
 using namespace cimg_library;
 
-//#####################
-// FUNCTION DEFINITIONS
-//#####################
 
 void doBrightness(string param, string inputFile, string outputFile) {
     cout << "Function doBrightness invoked with param: " << param << endl;
     
     try {
-        // Load image
         CImg<unsigned char> image(inputFile.c_str());
         cout << "Loaded image: " << inputFile << " (" << image.width() << "x" << image.height() << ")" << endl;
         
         int brightness = stoi(param);
         cout << "Adjusting brightness by: " << brightness << endl;
         
-        // Process each pixel
         for (int x = 0; x < image.width(); x++) {
             for (int y = 0; y < image.height(); y++) {
                 for (int c = 0; c < image.spectrum(); c++) {
                     int pixel = image(x, y, c);
                     pixel += brightness;
-                    // Clamp values between 0-255
                     if (pixel < 0) pixel = 0;
                     if (pixel > 255) pixel = 255;
                     image(x, y, c) = pixel;
@@ -38,7 +31,6 @@ void doBrightness(string param, string inputFile, string outputFile) {
             }
         }
         
-        // Save result
         image.save_bmp(outputFile.c_str());
         cout << "Saved processed image to: " << outputFile << endl;
         
@@ -57,14 +49,11 @@ void doContrast(string param, string inputFile, string outputFile) {
         float contrast = stof(param);
         cout << "Adjusting contrast by factor: " << contrast << endl;
         
-        // Process each pixel
         for (int x = 0; x < image.width(); x++) {
             for (int y = 0; y < image.height(); y++) {
                 for (int c = 0; c < image.spectrum(); c++) {
                     int pixel = image(x, y, c);
-                    // Apply contrast formula: newPixel = (pixel - 128) * contrast + 128
                     int newPixel = (int)((pixel - 128.0f) * contrast + 128.0f);
-                    // Clamp values
                     if (newPixel < 0) newPixel = 0;
                     if (newPixel > 255) newPixel = 255;
                     image(x, y, c) = newPixel;
@@ -87,7 +76,6 @@ void doGrayscale(string inputFile, string outputFile) {
         CImg<unsigned char> image(inputFile.c_str());
         cout << "Loaded image: " << inputFile << " (" << image.width() << "x" << image.height() << ")" << endl;
         
-        // Convert to grayscale
         for (int x = 0; x < image.width(); x++) {
             for (int y = 0; y < image.height(); y++) {
                 if (image.spectrum() >= 3) {
@@ -95,7 +83,6 @@ void doGrayscale(string inputFile, string outputFile) {
                     float g = image(x, y, 1);
                     float b = image(x, y, 2);
                     
-                    // Weighted average for grayscale
                     int gray = (int)(0.299f * r + 0.587f * g + 0.114f * b);
                     
                     image(x, y, 0) = gray;
@@ -113,9 +100,6 @@ void doGrayscale(string inputFile, string outputFile) {
     }
 }
 
-//##########################
-// HERE THE MAIN PART STARTS
-//##########################
 
 int main(int argc, char* argv[]) {
     cout << "\n\nImage Processing Application" << endl;
