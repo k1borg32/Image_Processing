@@ -1,6 +1,3 @@
-# Navigate to project directory
-cd project/
-
 #build project and make executable into build folder
 g++ -std=gnu++11 -O2 src/main.cpp -I./src -lgdi32 -o build/imageProcessor.exe
 
