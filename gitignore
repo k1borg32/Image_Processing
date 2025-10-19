@@ -61,8 +61,21 @@ Makefile
 ehthumbs.db
 Thumbs.db
 
-# Output images (optional - uncomment if you don't want to track output)
+# Output images 
 # images/*output*.bmp
 # images/bright_*.bmp
 # images/contrast_*.bmp
 # images/gray_*.bmp
+
+# VS Code personal settings
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.swp
+*~
