@@ -1,157 +1,106 @@
-#include <iostream>
-#include <string>
-
-#define cimg_display 0
-#define cimg_use_bmp
-#include "CImg.h"
+#include "ImageProcessor.h"
+#include "Metrics.h"
+#include "Utils.h"
 
 using namespace std;
 using namespace cimg_library;
 
-
-void doBrightness(string param, string inputFile, string outputFile) {
-    cout << "Function doBrightness invoked with param: " << param << endl;
-    
-    try {
-        CImg<unsigned char> image(inputFile.c_str());
-        cout << "Loaded image: " << inputFile << " (" << image.width() << "x" << image.height() << ")" << endl;
-        
-        int brightness = stoi(param);
-        cout << "Adjusting brightness by: " << brightness << endl;
-        
-        for (int x = 0; x < image.width(); x++) {
-            for (int y = 0; y < image.height(); y++) {
-                for (int c = 0; c < image.spectrum(); c++) {
-                    int pixel = image(x, y, c);
-                    pixel += brightness;
-                    if (pixel < 0) pixel = 0;
-                    if (pixel > 255) pixel = 255;
-                    image(x, y, c) = pixel;
-                }
-            }
-        }
-        
-        image.save_bmp(outputFile.c_str());
-        cout << "Saved processed image to: " << outputFile << endl;
-        
-    } catch (const exception& e) {
-        cout << "Error: " << e.what() << endl;
-    }
-}
-
-void doContrast(string param, string inputFile, string outputFile) {
-    cout << "Function doContrast invoked with param: " << param << endl;
-    
-    try {
-        CImg<unsigned char> image(inputFile.c_str());
-        cout << "Loaded image: " << inputFile << " (" << image.width() << "x" << image.height() << ")" << endl;
-        
-        float contrast = stof(param);
-        cout << "Adjusting contrast by factor: " << contrast << endl;
-        
-        for (int x = 0; x < image.width(); x++) {
-            for (int y = 0; y < image.height(); y++) {
-                for (int c = 0; c < image.spectrum(); c++) {
-                    int pixel = image(x, y, c);
-                    int newPixel = (int)((pixel - 128.0f) * contrast + 128.0f);
-                    if (newPixel < 0) newPixel = 0;
-                    if (newPixel > 255) newPixel = 255;
-                    image(x, y, c) = newPixel;
-                }
-            }
-        }
-        
-        image.save_bmp(outputFile.c_str());
-        cout << "Saved processed image to: " << outputFile << endl;
-        
-    } catch (const exception& e) {
-        cout << "Error: " << e.what() << endl;
-    }
-}
-
-void doGrayscale(string inputFile, string outputFile) {
-    cout << "Function doGrayscale invoked" << endl;
-    
-    try {
-        CImg<unsigned char> image(inputFile.c_str());
-        cout << "Loaded image: " << inputFile << " (" << image.width() << "x" << image.height() << ")" << endl;
-        
-        for (int x = 0; x < image.width(); x++) {
-            for (int y = 0; y < image.height(); y++) {
-                if (image.spectrum() >= 3) {
-                    float r = image(x, y, 0);
-                    float g = image(x, y, 1);
-                    float b = image(x, y, 2);
-                    
-                    int gray = (int)(0.299f * r + 0.587f * g + 0.114f * b);
-                    
-                    image(x, y, 0) = gray;
-                    image(x, y, 1) = gray;
-                    image(x, y, 2) = gray;
-                }
-            }
-        }
-        
-        image.save_bmp(outputFile.c_str());
-        cout << "Saved processed image to: " << outputFile << endl;
-        
-    } catch (const exception& e) {
-        cout << "Error: " << e.what() << endl;
-    }
-}
-
-
 int main(int argc, char* argv[]) {
-    cout << "\n\nImage Processing Application" << endl;
-    cout << "Uses CImg library for BMP file I/O\n" << endl;
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-    if (argc == 1) {
-        cout << "No command line parameters given.\n" << endl;
-        cout << "Usage: " << argv[0] << " <command> [parameter] <input.bmp> [output.bmp]" << endl;
-        cout << "Commands:" << endl;
-        cout << "  --brightness <value>   Adjust brightness (-255 to 255)" << endl;
-        cout << "  --contrast <factor>    Adjust contrast (0.1 to 3.0)" << endl;
-        cout << "  --grayscale           Convert to grayscale" << endl;
-        return 0;
-    }
+    if (argc < 2) { printHelp(argv[0]); return 0; }
+    Args a = parseArgs(argc, argv);
+    if (a.command == "--help" || a.command.empty()) { printHelp(argv[0]); return 0; }
 
-    if (argc < 3) {
-        cout << "Too few command line parameters given.\n" << endl;
-        return 0;
-    }
-
-    string command = argv[1];
-    
-    if (command == "--brightness") {
-        if (argc < 4) {
-            cout << "Error: --brightness requires a parameter and input file" << endl;
+    try {
+        if (a.command == "--mse" || a.command == "--pmse" || a.command == "--snr" || 
+            a.command == "--psnr" || a.command == "--md") {
+            string ref, cmp;
+            if (!readString(a.kv, "-ref", ref) || !readString(a.kv, "-cmp", cmp))
+                throw runtime_error("Metrics require -ref and -cmp");
+            auto P = load_pair(ref, cmp);
+            if      (a.command == "--mse")  cout << "MSE = "  << metric_MSE(P)     << "\n";
+            else if (a.command == "--pmse") cout << "PMSE = " << metric_PMSE(P)    << "\n";
+            else if (a.command == "--snr")  cout << "SNR (dB) = "  << metric_SNR_dB(P)  << "\n";
+            else if (a.command == "--psnr") cout << "PSNR (dB) = " << metric_PSNR_dB(P) << "\n";
+            else if (a.command == "--md")   cout << "MD = "   << metric_MD(P)      << "\n";
             return 0;
         }
-        string param = argv[2];
-        string inputFile = argv[3];
-        string outputFile = (argc > 4) ? argv[4] : "output.bmp";
-        doBrightness(param, inputFile, outputFile);
-        
-    } else if (command == "--contrast") {
-        if (argc < 4) {
-            cout << "Error: --contrast requires a parameter and input file" << endl;
-            return 0;
-        }
-        string param = argv[2];
-        string inputFile = argv[3];
-        string outputFile = (argc > 4) ? argv[4] : "output.bmp";
-        doContrast(param, inputFile, outputFile);
-        
-    } else if (command == "--grayscale") {
-        string inputFile = argv[2];
-        string outputFile = (argc > 3) ? argv[3] : "output.bmp";
-        doGrayscale(inputFile, outputFile);
-        
-    } else {
-        cout << "Unknown command: " + command << endl;
-        cout << "Available commands: --brightness, --contrast, --grayscale" << endl;
-    }
 
-    cout << endl;
+        string inputFile, outputFile;
+        if (!readString(a.kv, "-input", inputFile) || !readString(a.kv, "-output", outputFile))
+            throw runtime_error("Most commands require -input and -output");
+
+        ImageProcessor processor;
+        if (!processor.loadImage(inputFile)) {
+            throw runtime_error("Failed to load input image");
+        }
+
+        if (a.command == "--brightness") {
+            int value = 0;
+            if (!readInt(a.kv, "-value", value)) throw runtime_error("--brightness requires -value");
+            processor.applyBrightness(value);
+        }
+        else if (a.command == "--contrast") {
+            float factor = 1.0f;
+            if (!readFloat(a.kv, "-factor", factor)) throw runtime_error("--contrast requires -factor");
+            processor.applyContrast(factor);
+        }
+        else if (a.command == "--negative") {
+            processor.applyNegative();
+        }
+        else if (a.command == "--rgb") {
+            int r=0, g=0, b=0;
+            readInt(a.kv, "-r", r); readInt(a.kv, "-g", g); readInt(a.kv, "-b", b);
+            processor.applyRGBOffset(r, g, b);
+        }
+        else if (a.command == "--hflip") {
+            processor.applyHorizontalFlip();
+        }
+        else if (a.command == "--vflip") {
+            processor.applyVerticalFlip();
+        }
+        else if (a.command == "--dflip") {
+            processor.applyDiagonalFlip();
+        }
+        else if (a.command == "--shrink") {
+            float factor = 0.5f;
+            readFloat(a.kv, "-factor", factor);
+            processor.applyShrink(factor);
+        }
+        else if (a.command == "--enlarge") {
+            float factor = 2.0f;
+            readFloat(a.kv, "-factor", factor);
+            processor.applyEnlarge(factor);
+        }
+        else if (a.command == "--amean") {
+            int ksize = 3;
+            readInt(a.kv, "-ksize", ksize);
+            processor.applyArithmeticMean(ksize);
+        }
+        else if (a.command == "--adaptive") {
+            int ksize = 3, smax = 7;
+            readInt(a.kv, "-ksize", ksize);
+            readInt(a.kv, "-smax", smax);
+            processor.applyAdaptiveMedian(ksize, smax);
+        }
+        else {
+            throw runtime_error("Unknown command: " + a.command + " (try --help)");
+        }
+
+        if (!processor.saveImage(outputFile)) {
+            throw runtime_error("Failed to save output image");
+        }
+
+        cout << "✓ Processing complete!" << endl;
+
+    } catch (const CImgIOException& e) {
+        cerr << "CImg I/O error: " << e.what() << "\n";
+        return 1;
+    } catch (const exception& e) {
+        cerr << "Error: " << e.what() << "\n";
+        return 1;
+    }
     return 0;
 }
