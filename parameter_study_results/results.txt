@@ -1,0 +1,48 @@
+Starting parameter study: Sun Oct 26 16:38:13 CET 2025
+
+=== TEST 1: Adaptive Median ksize ===
+Testing ksize=3...
+[ImageProcessor] Loaded: images/Color/Noise/lenac_impulse1 (512x512x3 channels)
+[ImageProcessor] Applying adaptive median filter, kernel=3, smax=7
+[ImageProcessor] Saved to: parameter_study_results/images/adapt_k3
+✓ Processing complete!
+PSNR: PSNR (dB) = 35.4279
+
+Testing ksize=5...
+[ImageProcessor] Loaded: images/Color/Noise/lenac_impulse1 (512x512x3 channels)
+[ImageProcessor] Applying adaptive median filter, kernel=5, smax=7
+[ImageProcessor] Saved to: parameter_study_results/images/adapt_k5
+✓ Processing complete!
+PSNR: PSNR (dB) = 31.9552
+
+Testing ksize=7...
+[ImageProcessor] Loaded: images/Color/Noise/lenac_impulse1 (512x512x3 channels)
+[ImageProcessor] Applying adaptive median filter, kernel=7, smax=7
+[ImageProcessor] Saved to: parameter_study_results/images/adapt_k7
+✓ Processing complete!
+PSNR: PSNR (dB) = 30.013
+
+=== TEST 2: Arithmetic Mean kernel ===
+Testing k=3...
+[ImageProcessor] Loaded: images/Color/Noise/lenac_normal1 (512x512x3 channels)
+[ImageProcessor] Applying arithmetic mean filter, kernel=3
+[ImageProcessor] Saved to: parameter_study_results/images/amean_k3
+✓ Processing complete!
+PSNR: PSNR (dB) = 31.9496
+
+Testing k=5...
+[ImageProcessor] Loaded: images/Color/Noise/lenac_normal1 (512x512x3 channels)
+[ImageProcessor] Applying arithmetic mean filter, kernel=5
+[ImageProcessor] Saved to: parameter_study_results/images/amean_k5
+✓ Processing complete!
+PSNR: PSNR (dB) = 29.4237
+
+Testing k=7...
+[ImageProcessor] Loaded: images/Color/Noise/lenac_normal1 (512x512x3 channels)
+[ImageProcessor] Applying arithmetic mean filter, kernel=7
+[ImageProcessor] Saved to: parameter_study_results/images/amean_k7
+✓ Processing complete!
+PSNR: PSNR (dB) = 27.5445
+
+
+✓ COMPLETE! Results in: parameter_study_results/

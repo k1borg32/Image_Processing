@@ -1,0 +1,143 @@
+
+===============================================
+  PART 1: COLOR - IMPULSE NOISE
+===============================================
+--- Original vs Noisy (impulse) ---
+MSE:  MSE = 155.591
+PMSE: PMSE = 0.00239278
+SNR:  SNR (dB) = 21.0711
+PSNR: PSNR (dB) = 26.211
+MD:   MD = 64
+
+[ImageProcessor] Loaded: images/Color/Noise/lenac_impulse1 (512x512x3 channels)
+[ImageProcessor] Applying adaptive median filter, kernel=3, smax=9
+[ImageProcessor] Saved to: final_results/color/adaptive_impulse
+✓ Processing complete!
+--- Adaptive Median ---
+MSE:  MSE = 18.6204
+PMSE: PMSE = 0.000286357
+SNR:  SNR (dB) = 30.2911
+PSNR: PSNR (dB) = 35.4309
+MD:   MD = 74
+
+[ImageProcessor] Loaded: images/Color/Noise/lenac_impulse1 (512x512x3 channels)
+[ImageProcessor] Applying arithmetic mean filter, kernel=3
+[ImageProcessor] Saved to: final_results/color/amean_impulse
+✓ Processing complete!
+--- Arithmetic Mean k=3 ---
+MSE:  MSE = 42.2024
+PMSE: PMSE = 0.000649019
+SNR:  SNR (dB) = 26.7376
+PSNR: PSNR (dB) = 31.8774
+MD:   MD = 65
+
+
+===============================================
+  PART 2: COLOR - GAUSSIAN NOISE
+===============================================
+--- Original vs Noisy (Gaussian) ---
+MSE:  MSE = 152.28
+PMSE: PMSE = 0.00234187
+SNR:  SNR (dB) = 21.1645
+PSNR: PSNR (dB) = 26.3044
+MD:   MD = 51
+
+[ImageProcessor] Loaded: images/Color/Noise/lenac_normal1 (512x512x3 channels)
+[ImageProcessor] Applying arithmetic mean filter, kernel=3
+[ImageProcessor] Saved to: final_results/color/amean_gaussian
+✓ Processing complete!
+--- Arithmetic Mean k=3 ---
+MSE:  MSE = 41.5073
+PMSE: PMSE = 0.000638329
+SNR:  SNR (dB) = 26.8097
+PSNR: PSNR (dB) = 31.9496
+MD:   MD = 68
+
+[ImageProcessor] Loaded: images/Color/Noise/lenac_normal1 (512x512x3 channels)
+[ImageProcessor] Applying adaptive median filter, kernel=3, smax=9
+[ImageProcessor] Saved to: final_results/color/adaptive_gaussian
+✓ Processing complete!
+--- Adaptive Median ---
+MSE:  MSE = 30.1482
+PMSE: PMSE = 0.000463641
+SNR:  SNR (dB) = 28.1983
+PSNR: PSNR (dB) = 33.3382
+MD:   MD = 72
+
+
+===============================================
+  PART 3: GRAYSCALE - IMPULSE NOISE
+===============================================
+--- Original vs Noisy (impulse) ---
+MSE:  MSE = 156.664
+PMSE: PMSE = 0.00267509
+SNR:  SNR (dB) = 20.5009
+PSNR: PSNR (dB) = 25.7266
+MD:   MD = 231
+
+[ImageProcessor] Loaded: images/Gray/Noise/lena_impulse1 (512x512x3 channels)
+[ImageProcessor] Applying adaptive median filter, kernel=3, smax=9
+[ImageProcessor] Saved to: final_results/gray/adaptive_impulse
+✓ Processing complete!
+--- Adaptive Median ---
+MSE:  MSE = 5.58912
+PMSE: PMSE = 9.5436e-05
+SNR:  SNR (dB) = 34.9771
+PSNR: PSNR (dB) = 40.2029
+MD:   MD = 67
+
+[ImageProcessor] Loaded: images/Gray/Noise/lena_impulse1 (512x512x3 channels)
+[ImageProcessor] Applying arithmetic mean filter, kernel=3
+[ImageProcessor] Saved to: final_results/gray/amean_impulse
+✓ Processing complete!
+--- Arithmetic Mean k=3 ---
+MSE:  MSE = 42.7327
+PMSE: PMSE = 0.000729676
+SNR:  SNR (dB) = 26.1429
+PSNR: PSNR (dB) = 31.3687
+MD:   MD = 76
+
+
+===============================================
+  PART 4: GRAYSCALE - GAUSSIAN NOISE
+===============================================
+--- Original vs Noisy (Gaussian) ---
+MSE:  MSE = 332.336
+PMSE: PMSE = 0.00567475
+SNR:  SNR (dB) = 17.2348
+PSNR: PSNR (dB) = 22.4605
+MD:   MD = 51
+
+[ImageProcessor] Loaded: images/Gray/Noise/lena_normal1 (512x512x3 channels)
+[ImageProcessor] Applying arithmetic mean filter, kernel=3
+[ImageProcessor] Saved to: final_results/gray/amean_gaussian
+✓ Processing complete!
+--- Arithmetic Mean k=3 ---
+MSE:  MSE = 61.1977
+PMSE: PMSE = 0.00104497
+SNR:  SNR (dB) = 24.5832
+PSNR: PSNR (dB) = 29.809
+MD:   MD = 64
+
+[ImageProcessor] Loaded: images/Gray/Noise/lena_normal1 (512x512x3 channels)
+[ImageProcessor] Applying adaptive median filter, kernel=3, smax=9
+[ImageProcessor] Saved to: final_results/gray/adaptive_gaussian
+✓ Processing complete!
+--- Adaptive Median ---
+MSE:  MSE = 98.1125
+PMSE: PMSE = 0.0016753
+SNR:  SNR (dB) = 22.5333
+PSNR: PSNR (dB) = 27.7591
+MD:   MD = 70
+
+
+===============================================
+  ✓ TESTS COMPLETE!
+===============================================
+Color images: final_results/color/
+Gray images:  final_results/gray/
+
+Color images generated:        4
+Gray images generated:         4
+
+Full log saved to: final_results/complete_log.txt

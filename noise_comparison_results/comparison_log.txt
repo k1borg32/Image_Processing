@@ -1,0 +1,69 @@
+
+=== IMPULSE NOISE ANALYSIS ===
+
+--- 1. Original vs Noisy Impulse ---
+MSE:  MSE = 155.591
+PMSE: PMSE = 0.00239278
+SNR:  SNR (dB) = 21.0711
+PSNR: PSNR (dB) = 26.211
+MD:   MD = 64
+
+[ImageProcessor] Loaded: images/Color/Noise/lenac_impulse1 (512x512x3 channels)
+[ImageProcessor] Applying adaptive median filter, kernel=3, smax=9
+[ImageProcessor] Saved to: noise_comparison_results/adaptive_impulse
+✓ Processing complete!
+--- 2. Adaptive Median on Impulse ---
+MSE:  MSE = 18.6204
+PMSE: PMSE = 0.000286357
+SNR:  SNR (dB) = 30.2911
+PSNR: PSNR (dB) = 35.4309
+MD:   MD = 74
+
+[ImageProcessor] Loaded: images/Color/Noise/lenac_impulse1 (512x512x3 channels)
+[ImageProcessor] Applying arithmetic mean filter, kernel=3
+[ImageProcessor] Saved to: noise_comparison_results/amean_impulse
+✓ Processing complete!
+--- 3. Arithmetic Mean on Impulse ---
+MSE:  MSE = 42.2024
+PMSE: PMSE = 0.000649019
+SNR:  SNR (dB) = 26.7376
+PSNR: PSNR (dB) = 31.8774
+MD:   MD = 65
+
+
+=== GAUSSIAN NOISE ANALYSIS ===
+
+--- 1. Original vs Noisy Gaussian ---
+MSE:  MSE = 152.28
+PMSE: PMSE = 0.00234187
+SNR:  SNR (dB) = 21.1645
+PSNR: PSNR (dB) = 26.3044
+MD:   MD = 51
+
+[ImageProcessor] Loaded: images/Color/Noise/lenac_normal1 (512x512x3 channels)
+[ImageProcessor] Applying arithmetic mean filter, kernel=3
+[ImageProcessor] Saved to: noise_comparison_results/amean_gaussian
+✓ Processing complete!
+--- 2. Arithmetic Mean on Gaussian ---
+MSE:  MSE = 41.5073
+PMSE: PMSE = 0.000638329
+SNR:  SNR (dB) = 26.8097
+PSNR: PSNR (dB) = 31.9496
+MD:   MD = 68
+
+[ImageProcessor] Loaded: images/Color/Noise/lenac_normal1 (512x512x3 channels)
+[ImageProcessor] Applying adaptive median filter, kernel=3, smax=9
+[ImageProcessor] Saved to: noise_comparison_results/adaptive_gaussian
+✓ Processing complete!
+--- 3. Adaptive Median on Gaussian ---
+MSE:  MSE = 30.1482
+PMSE: PMSE = 0.000463641
+SNR:  SNR (dB) = 28.1983
+PSNR: PSNR (dB) = 33.3382
+MD:   MD = 72
+
+
+==========================================
+✓ Noise comparison tests complete!
+Images: noise_comparison_results/
+==========================================

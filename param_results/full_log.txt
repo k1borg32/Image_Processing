@@ -1,0 +1,135 @@
+TEST 1: Adaptive Median ksize Study (on Impulse Noise)
+
+[ImageProcessor] Loaded: images/Color/Noise/lenac_impulse1 (512x512x3 channels)
+[ImageProcessor] Applying adaptive median filter, kernel=3, smax=9
+[ImageProcessor] Saved to: param_results/images/adaptive_k3_s9
+✓ Processing complete!
+--- Adaptive Median ksize=3, smax=9 ---
+MSE:  MSE = 18.6204
+PMSE: PMSE = 0.000286357
+SNR:  SNR (dB) = 30.2911
+PSNR: PSNR (dB) = 35.4309
+MD:   MD = 74
+
+[ImageProcessor] Loaded: images/Color/Noise/lenac_impulse1 (512x512x3 channels)
+[ImageProcessor] Applying adaptive median filter, kernel=5, smax=9
+[ImageProcessor] Saved to: param_results/images/adaptive_k5_s9
+✓ Processing complete!
+--- Adaptive Median ksize=5, smax=9 ---
+MSE:  MSE = 41.4406
+PMSE: PMSE = 0.000637302
+SNR:  SNR (dB) = 26.8167
+PSNR: PSNR (dB) = 31.9565
+MD:   MD = 108
+
+[ImageProcessor] Loaded: images/Color/Noise/lenac_impulse1 (512x512x3 channels)
+[ImageProcessor] Applying adaptive median filter, kernel=7, smax=9
+[ImageProcessor] Saved to: param_results/images/adaptive_k7_s9
+✓ Processing complete!
+--- Adaptive Median ksize=7, smax=9 ---
+MSE:  MSE = 64.8171
+PMSE: PMSE = 0.000996802
+SNR:  SNR (dB) = 24.874
+PSNR: PSNR (dB) = 30.0139
+MD:   MD = 131
+
+
+TEST 2: Adaptive Median smax Study (on Impulse Noise)
+
+[ImageProcessor] Loaded: images/Color/Noise/lenac_impulse1 (512x512x3 channels)
+[ImageProcessor] Applying adaptive median filter, kernel=3, smax=5
+[ImageProcessor] Saved to: param_results/images/adaptive_k3_s5
+✓ Processing complete!
+--- Adaptive Median ksize=3, smax=5 ---
+MSE:  MSE = 18.6862
+PMSE: PMSE = 0.000287369
+SNR:  SNR (dB) = 30.2757
+PSNR: PSNR (dB) = 35.4156
+MD:   MD = 74
+
+[ImageProcessor] Loaded: images/Color/Noise/lenac_impulse1 (512x512x3 channels)
+[ImageProcessor] Applying adaptive median filter, kernel=3, smax=7
+[ImageProcessor] Saved to: param_results/images/adaptive_k3_s7
+✓ Processing complete!
+--- Adaptive Median ksize=3, smax=7 ---
+MSE:  MSE = 18.6335
+PMSE: PMSE = 0.000286559
+SNR:  SNR (dB) = 30.288
+PSNR: PSNR (dB) = 35.4279
+MD:   MD = 74
+
+[ImageProcessor] Loaded: images/Color/Noise/lenac_impulse1 (512x512x3 channels)
+[ImageProcessor] Applying adaptive median filter, kernel=3, smax=9
+[ImageProcessor] Saved to: param_results/images/adaptive_k3_s9
+✓ Processing complete!
+--- Adaptive Median ksize=3, smax=9 ---
+MSE:  MSE = 18.6204
+PMSE: PMSE = 0.000286357
+SNR:  SNR (dB) = 30.2911
+PSNR: PSNR (dB) = 35.4309
+MD:   MD = 74
+
+[ImageProcessor] Loaded: images/Color/Noise/lenac_impulse1 (512x512x3 channels)
+[ImageProcessor] Applying adaptive median filter, kernel=3, smax=11
+[ImageProcessor] Saved to: param_results/images/adaptive_k3_s11
+✓ Processing complete!
+--- Adaptive Median ksize=3, smax=11 ---
+MSE:  MSE = 18.6204
+PMSE: PMSE = 0.000286358
+SNR:  SNR (dB) = 30.291
+PSNR: PSNR (dB) = 35.4309
+MD:   MD = 74
+
+
+TEST 3: Arithmetic Mean Kernel Study (on Gaussian Noise)
+
+[ImageProcessor] Loaded: images/Color/Noise/lenac_normal1 (512x512x3 channels)
+[ImageProcessor] Applying arithmetic mean filter, kernel=3
+[ImageProcessor] Saved to: param_results/images/amean_k3_gauss
+✓ Processing complete!
+--- Arithmetic Mean k=3 ---
+MSE:  MSE = 41.5073
+PMSE: PMSE = 0.000638329
+SNR:  SNR (dB) = 26.8097
+PSNR: PSNR (dB) = 31.9496
+MD:   MD = 68
+
+[ImageProcessor] Loaded: images/Color/Noise/lenac_normal1 (512x512x3 channels)
+[ImageProcessor] Applying arithmetic mean filter, kernel=5
+[ImageProcessor] Saved to: param_results/images/amean_k5_gauss
+✓ Processing complete!
+--- Arithmetic Mean k=5 ---
+MSE:  MSE = 74.2516
+PMSE: PMSE = 0.00114189
+SNR:  SNR (dB) = 24.2839
+PSNR: PSNR (dB) = 29.4237
+MD:   MD = 103
+
+[ImageProcessor] Loaded: images/Color/Noise/lenac_normal1 (512x512x3 channels)
+[ImageProcessor] Applying arithmetic mean filter, kernel=7
+[ImageProcessor] Saved to: param_results/images/amean_k7_gauss
+✓ Processing complete!
+--- Arithmetic Mean k=7 ---
+MSE:  MSE = 114.455
+PMSE: PMSE = 0.00176017
+SNR:  SNR (dB) = 22.4046
+PSNR: PSNR (dB) = 27.5445
+MD:   MD = 120
+
+[ImageProcessor] Loaded: images/Color/Noise/lenac_normal1 (512x512x3 channels)
+[ImageProcessor] Applying arithmetic mean filter, kernel=9
+[ImageProcessor] Saved to: param_results/images/amean_k9_gauss
+✓ Processing complete!
+--- Arithmetic Mean k=9 ---
+MSE:  MSE = 152.757
+PMSE: PMSE = 0.00234921
+SNR:  SNR (dB) = 21.1509
+PSNR: PSNR (dB) = 26.2908
+MD:   MD = 122
+
+
+==========================================
+✓ All parameter tests complete!
+Results: param_results/images/
+Log: param_results/full_log.txt
+==========================================
