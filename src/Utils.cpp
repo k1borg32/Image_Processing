@@ -1,5 +1,6 @@
 #include "Utils.h"
-#include <windows.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 using namespace std;
 using namespace cimg_library;
@@ -53,15 +54,18 @@ static string ensureBmpExtension(const string& path) {
 string resolveAbsolutePath(const string& path) {
     string pathWithExt = ensureBmpExtension(path);
     
-    if (pathWithExt.length() >= 2 && 
-        ((pathWithExt[1] == ':') || (pathWithExt[0] == '\\' && pathWithExt[1] == '\\'))) {
+    // Check if path is already absolute (starts with /)
+    if (pathWithExt.length() >= 1 && pathWithExt[0] == '/') {
         return pathWithExt;
     }
     
-    char currentDir[MAX_PATH];
-    GetCurrentDirectoryA(MAX_PATH, currentDir);
+    // Get current working directory
+    char currentDir[PATH_MAX];
+    if (getcwd(currentDir, sizeof(currentDir)) == nullptr) {
+        return pathWithExt; // Fallback to relative path
+    }
     
-    string absPath = string(currentDir) + "\\" + pathWithExt;
+    string absPath = string(currentDir) + "/" + pathWithExt;
     
     return absPath;
 }
@@ -69,10 +73,14 @@ string resolveAbsolutePath(const string& path) {
 void saveAsBMP(const CImg<unsigned char>& img, const string& outputPath) {
     string absPath = resolveAbsolutePath(outputPath);
     
-    size_t pos = absPath.find_last_of("\\/");
+    // Create directory if it doesn't exist (POSIX version)
+    size_t pos = absPath.find_last_of("/");
     if (pos != string::npos) {
         string dir = absPath.substr(0, pos);
-        CreateDirectoryA(dir.c_str(), NULL);
+        
+        // Create directory with permissions 0755 (rwxr-xr-x)
+        // This will fail silently if directory already exists
+        mkdir(dir.c_str(), 0755);
     }
     
     img.save_bmp(absPath.c_str());
@@ -113,12 +121,12 @@ void printHelp(const char* prog) {
     cout << "  --md         -ref=X -cmp=Y   Maximum difference\n\n";
 
     cout << "Examples (extension optional, use quotes for decimals):\n";
-    cout << "  " << prog << " --brightness -value=40 -input=images/lenac_small -output=output_images/lenac_bright\n";
-    cout << "  " << prog << " --contrast -factor=\"1.8\" -input=images/girlbw_small -output=output_images/girl_contrast\n";
-    cout << "  " << prog << " --shrink -factor=\"0.5\" -input=images/mandrilbw_small -output=output_images/mandril_shrink\n";
+    cout << "  " << prog << " --brightness -value=40 -input=images/Color/lenac -output=output_images/lenac_bright\n";
+    cout << "  " << prog << " --contrast -factor=1.8 -input=images/Binary/girlbw -output=output_images/girl_contrast\n";
+    cout << "  " << prog << " --shrink -factor=0.5 -input=images/Binary/mandrilbw -output=output_images/mandril_shrink\n";
     cout << "  " << prog << " --psnr -ref=images/Gray/lena -cmp=output_images/lena_filtered\n\n";
 
-    cout << "To run all of the commands in one go ,run automated script\n";
-    cout << "    .\\test_comprehensive.bat\n";
+    cout << "To run all of the commands in one go, run automated script\n";
+    cout << "    ./test_comprehensive.sh\n";
     cout << "This script will exercise all filters, enhancements, and metrics.\n";
 }
