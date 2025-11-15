@@ -9,6 +9,8 @@
 #include <limits>
 #include <stdexcept>
 #include <iostream>
+#include <climits>     
+#include <unistd.h>     
 
 #define cimg_display 0
 #define cimg_use_bmp

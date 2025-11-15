@@ -79,3 +79,34 @@ Desktop.ini
 *.tmp
 *.swp
 *~
+
+# Create/replace .gitignore
+cat > .gitignore << 'EOF'
+# Build artifacts
+build/
+*.exe
+*.o
+*.obj
+
+# macOS system files
+.DS_Store
+**/.DS_Store
+._.DS_Store
+**/._.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Output images (optional - uncomment if you don't want to track them)
+# output_images/
+
+# Temporary files
+*.tmp
+*.bak
+EOF
