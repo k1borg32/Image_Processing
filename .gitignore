@@ -1,112 +1,26 @@
-# Binaries
-build/
-*.exe
-*.out
-imageProcessor
-imageProcessor_debug
-
-# Compiled Object files
-*.o
-*.obj
-
-# Precompiled Headers
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
-
-# CMake
-CMakeCache.txt
-CMakeFiles/
-cmake_install.cmake
-Makefile
-*.cmake
-
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Output images 
-# images/*output*.bmp
-# images/bright_*.bmp
-# images/contrast_*.bmp
-# images/gray_*.bmp
-
-# VS Code personal settings
-.vscode/
-
-# OS files
-.DS_Store
-Thumbs.db
-Desktop.ini
-
-# Temporary files
-*.tmp
-*.swp
-*~
-
-# Create/replace .gitignore
-cat > .gitignore << 'EOF'
 # Build artifacts
-build/
-*.exe
+imageProcessor
 *.o
-*.obj
+*.out
+build/
 
-# macOS system files
+# macOS
 .DS_Store
-**/.DS_Store
-._.DS_Store
-**/._.DS_Store
 .AppleDouble
 .LSOverride
 
-# IDE files
+# VS Code
 .vscode/
-.idea/
-*.swp
-*.swo
-*~
+*.code-workspace
 
-# Output images (optional - uncomment if you don't want to track them)
-# output_images/
+# Output images (keep folder structure but not generated files)
+output/*.bmp
+output/*.jpg
+output/*.png
+results/*.txt
 
-# Temporary files
-*.tmp
-*.bak
-EOF
+# Keep these directories in git
+!output/.gitkeep
+!results/.gitkeep
+build/
+imageProcessor
