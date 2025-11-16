@@ -4,7 +4,6 @@
 #include "Utils.h"
 #include <cctype>
 #include <iomanip>
-#include <limits>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -14,42 +13,21 @@ using namespace std;
 void printHelp() {
     cout << "Image Processing - Task 2\n";
     cout << "Usage: ./imageProcessor --command -input=file -output=file [options]\n\n";
-    cout << "Histogram equalisation (H1-H5):\n";
-    cout << "  --huniform       : Uniform CDF\n";
-    cout << "  --hexponent      : Exponential CDF (use -alpha)\n";
-    cout << "  --hrayleigh      : Rayleigh CDF (use -alpha)\n";
-    cout << "  --hpower         : Power 2/3 CDF\n";
-    cout << "  --hhyper         : Hyperbolic CDF\n";
-    cout << "  --histogram      : Save histogram image (-channel)\n";
-    cout << '\n';
-    cout << "Image characteristics (C1-C6):\n";
+    cout << "Supported commands:\n";
+    cout << "  --hpower         : Power 2/3 histogram equalisation (-gmin, -gmax)\n";
+    cout << "  --characteristics : Print all image characteristics (-channel)\n";
     cout << "  --cmean, --cvariance, --cstdev, --cvarcoi\n";
     cout << "  --casyco, --cflatco, --cvarcoii, --centropy\n";
-    cout << "  --characteristics : Print all characteristics\n";
-    cout << '\n';
-    cout << "Linear filters (S1-S6):\n";
-    cout << "  --slowpass       : Low-pass smoothing (-mask=1..3)\n";
     cout << "  --sedgesharp     : Edge sharpening (-variant=1..3 or -optimized)\n";
-    cout << "  --sexdeti        : Detail extraction I\n";
-    cout << "  --sexdetii       : Detail extraction II\n";
-    cout << "  --slaplace       : Laplacian (-mask=1..3)\n";
-    cout << "  --slineid        : Line identification\n";
-    cout << '\n';
-    cout << "Non-linear filters (O1-O6):\n";
-    cout << "  --orobertsi, --orobertsii\n";
-    cout << "  --osobel, --okirsch\n";
-    cout << "  --orosenfeld (-P=1,2,4,8,16)\n";
-    cout << "  --oll\n\n";
+    cout << "  --orosenfeld     : Rosenfeld operator (-P=1,2,4,8,16)\n\n";
     cout << "Options:\n";
     cout << "  -input=PATH      : Input image file\n";
     cout << "  -output=PATH     : Output image file\n";
     cout << "  -channel=N       : Channel index (0-based)\n";
     cout << "  -gmin=N          : Min output level (default 0)\n";
     cout << "  -gmax=N          : Max output level (default 255)\n";
-    cout << "  -alpha=F         : Shape parameter for exponential/Rayleigh\n";
-    cout << "  -mask=N          : Mask index for S1/S5 (1..3)\n";
     cout << "  -variant=N       : Variant for --sedgesharp (1..3)\n";
-    cout << "  -optimized       : Use optimized Sharpen (S2)\n";
+    cout << "  -optimized       : Use optimized sharpening\n";
     cout << "  -P=N             : Window size for Rosenfeld (1,2,4,8,16)\n";
 }
 
@@ -63,10 +41,8 @@ int main(int argc, char* argv[]) {
     int channel = 0;
     int gmin = 0, gmax = 255;
     int variant = 1;
-    int maskIndex = 1;
     int P = 1;
     bool optimized = false;
-    float alpha = std::numeric_limits<float>::quiet_NaN();
     
     for (int i = 1; i < argc; ++i) {
         string arg = argv[i];
@@ -95,12 +71,6 @@ int main(int argc, char* argv[]) {
         }
         else if (arg.find("-variant=") == 0) {
             variant = stoi(arg.substr(9));
-        }
-        else if (arg.find("-mask=") == 0) {
-            maskIndex = stoi(arg.substr(6));
-        }
-        else if (arg.find("-alpha=") == 0) {
-            alpha = stof(arg.substr(7));
         }
         else if (arg.find("-P=") == 0) {
             P = stoi(arg.substr(3));
@@ -161,46 +131,11 @@ int main(int argc, char* argv[]) {
         bool produceImage = false;
         string actionDescription;
 
-        if (command == "--huniform") {
-            result = histogram_uniform(img, gmin, gmax);
-            produceImage = true;
-            actionDescription = "Applied uniform histogram equalisation";
-            ensureOutput(slugify(command));
-        }
-        else if (command == "--hexponent") {
-            float effectiveAlpha = std::isnan(alpha) ? 1.0f : alpha;
-            result = histogram_exponential(img, effectiveAlpha, gmin, gmax);
-            produceImage = true;
-            actionDescription = "Applied exponential histogram equalisation";
-            ensureOutput(slugify(command));
-        }
-        else if (command == "--hrayleigh") {
-            float effectiveAlpha = std::isnan(alpha) ? 45.0f : alpha;
-            result = histogram_rayleigh(img, effectiveAlpha, gmin, gmax);
-            produceImage = true;
-            actionDescription = "Applied Rayleigh histogram equalisation";
-            ensureOutput(slugify(command));
-        }
-        else if (command == "--hpower") {
+        if (command == "--hpower") {
             result = histogram_power23(img, gmin, gmax);
             produceImage = true;
             actionDescription = "Applied power 2/3 histogram equalisation";
             ensureOutput(slugify(command));
-        }
-        else if (command == "--hhyper") {
-            result = histogram_hyperbolic(img, gmin, gmax);
-            produceImage = true;
-            actionDescription = "Applied hyperbolic histogram equalisation";
-            ensureOutput(slugify(command));
-        }
-        else if (command == "--histogram") {
-            ensureChannelValid();
-            if (outputPath.empty()) {
-                outputPath = "output/hist_channel" + to_string(channel) + ".bmp";
-            }
-            auto hist = compute_histogram(img, channel);
-            save_histogram_image(hist, outputPath);
-            return 0;
         }
         else if (command == "--characteristics") {
             const auto& ch = getCharacteristics();
@@ -256,12 +191,6 @@ int main(int argc, char* argv[]) {
             cout << fixed << setprecision(6) << ch.entropy << "\n";
             return 0;
         }
-        else if (command == "--slowpass") {
-            result = low_pass_filter(img, maskIndex);
-            produceImage = true;
-            actionDescription = "Applied low-pass smoothing (mask " + to_string(maskIndex) + ")";
-            ensureOutput(slugify(command) + "_m" + to_string(maskIndex));
-        }
         else if (command == "--sedgesharp") {
             if (!optimized && (variant < 1 || variant > 3)) {
                 throw runtime_error("--sedgesharp requires -variant in {1,2,3} or -optimized");
@@ -281,54 +210,6 @@ int main(int argc, char* argv[]) {
             produceImage = true;
             ensureOutput(slugify(command) + (optimized ? "_opt" : "_v" + to_string(variant)));
         }
-        else if (command == "--sexdeti") {
-            result = detail_extraction_i(img);
-            produceImage = true;
-            actionDescription = "Applied detail extraction set I";
-            ensureOutput(slugify(command));
-        }
-        else if (command == "--sexdetii") {
-            result = detail_extraction_ii(img);
-            produceImage = true;
-            actionDescription = "Applied detail extraction set II";
-            ensureOutput(slugify(command));
-        }
-        else if (command == "--slaplace") {
-            result = laplacian_filter(img, maskIndex);
-            produceImage = true;
-            actionDescription = "Applied Laplacian filter (mask " + to_string(maskIndex) + ")";
-            ensureOutput(slugify(command) + "_m" + to_string(maskIndex));
-        }
-        else if (command == "--slineid") {
-            result = line_identification(img);
-            produceImage = true;
-            actionDescription = "Applied line identification filter";
-            ensureOutput(slugify(command));
-        }
-        else if (command == "--orobertsi") {
-            result = roberts_operator_I(img);
-            produceImage = true;
-            actionDescription = "Applied Roberts operator I";
-            ensureOutput(slugify(command));
-        }
-        else if (command == "--orobertsii") {
-            result = roberts_operator_II(img);
-            produceImage = true;
-            actionDescription = "Applied Roberts operator II";
-            ensureOutput(slugify(command));
-        }
-        else if (command == "--osobel") {
-            result = sobel_operator(img);
-            produceImage = true;
-            actionDescription = "Applied Sobel operator";
-            ensureOutput(slugify(command));
-        }
-        else if (command == "--okirsch" || command == "--okirsf") {
-            result = kirsch_operator(img);
-            produceImage = true;
-            actionDescription = "Applied Kirsch operator";
-            ensureOutput("okirsch");
-        }
         else if (command == "--orosenfeld") {
             switch (P) {
                 case 1: case 2: case 4: case 8: case 16:
@@ -340,12 +221,6 @@ int main(int argc, char* argv[]) {
             produceImage = true;
             actionDescription = "Applied Rosenfeld operator (P=" + to_string(P) + ")";
             ensureOutput(slugify(command) + "_P" + to_string(P));
-        }
-        else if (command == "--oll") {
-            result = ll_operator(img);
-            produceImage = true;
-            actionDescription = "Applied LL operator";
-            ensureOutput(slugify(command));
         }
         else {
             cerr << "Unknown command: " << command << "\n";

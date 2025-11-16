@@ -1,8 +1,7 @@
 #include "Histogram.h"
 #include <cmath>
+#include <algorithm>
 #include <functional>
-#include <iomanip>
-#include <iostream>
 #include <stdexcept>
 
 using namespace std;
@@ -71,46 +70,6 @@ vector<int> compute_histogram(const CImg<unsigned char>& src, int channel) {
     return hist;
 }
 
-CImg<unsigned char> histogram_uniform(const CImg<unsigned char>& src,
-                                       int gmin, int gmax) {
-    validate_range(gmin, gmax);
-    const float range = static_cast<float>(gmax - gmin);
-    return apply_histogram_mapping(src, [=](float cdfValue) {
-        return static_cast<float>(gmin) + range * cdfValue;
-    });
-}
-
-CImg<unsigned char> histogram_exponential(const CImg<unsigned char>& src,
-                                          float alpha,
-                                          int gmin,
-                                          int gmax) {
-    validate_range(gmin, gmax);
-    if (alpha <= 0.0f) {
-        throw runtime_error("--hexponent requires alpha > 0");
-    }
-    return apply_histogram_mapping(src, [=](float cdfValue) {
-        float safe = max(1e-6f, 1.0f - cdfValue);
-        float mapped = static_cast<float>(gmin) - (1.0f / alpha) * std::log(safe);
-        return mapped;
-    });
-}
-
-CImg<unsigned char> histogram_rayleigh(const CImg<unsigned char>& src,
-                                        float alpha,
-                                        int gmin,
-                                        int gmax) {
-    validate_range(gmin, gmax);
-    if (alpha <= 0.0f) {
-        throw runtime_error("--hrayleigh requires alpha > 0");
-    }
-    const float alphaSquared = alpha * alpha;
-    return apply_histogram_mapping(src, [=](float cdfValue) {
-        float safe = max(1e-6f, 1.0f - cdfValue);
-        float mapped = static_cast<float>(gmin) + std::sqrt(-2.0f * alphaSquared * std::log(safe));
-        return mapped;
-    });
-}
-
 CImg<unsigned char> histogram_power23(const CImg<unsigned char>& src,
                                        int gmin,
                                        int gmax) {
@@ -121,42 +80,6 @@ CImg<unsigned char> histogram_power23(const CImg<unsigned char>& src,
         float gThird = gminThird + (gmaxThird - gminThird) * cdfValue;
         return std::pow(gThird, 3.0f);
     });
-}
-
-CImg<unsigned char> histogram_hyperbolic(const CImg<unsigned char>& src,
-                                          int gmin,
-                                          int gmax) {
-    validate_range(gmin, gmax);
-    const float gminShifted = static_cast<float>(gmin) + 1.0f;
-    const float gmaxShifted = static_cast<float>(gmax) + 1.0f;
-    const float logRatio = std::log(gmaxShifted) - std::log(gminShifted);
-    return apply_histogram_mapping(src, [=](float cdfValue) {
-        float mapped = std::exp(std::log(gminShifted) + logRatio * cdfValue) - 1.0f;
-        return mapped;
-    });
-}
-
-void save_histogram_image(const vector<int>& hist, const string& outputPath) {
-    const int width = 512;
-    const int height = 300;
-    CImg<unsigned char> img(width, height, 1, 1, 255);
-
-    int maxVal = *max_element(hist.begin(), hist.end());
-    if (maxVal == 0) {
-        maxVal = 1;
-    }
-
-    for (int i = 0; i < 256; ++i) {
-        int barHeight = static_cast<int>((static_cast<float>(hist[i]) / maxVal) * (height - 20));
-        int x = i * 2;
-        for (int y = height - barHeight; y < height; ++y) {
-            img(x, y) = 0;
-            if (x + 1 < width) img(x + 1, y) = 0;
-        }
-    }
-
-    saveAsBMP(img, outputPath);
-    cout << "Histogram saved to: " << resolveAbsolutePath(outputPath) << endl;
 }
 
 ImageCharacteristics compute_characteristics(const CImg<unsigned char>& src,
