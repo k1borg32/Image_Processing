@@ -106,7 +106,7 @@ int main(int argc, char* argv[]) {
 
         auto ensureOutput = [&](const string& suffix) {
             if (outputPath.empty()) {
-                outputPath = "output/" + suffix + ".bmp";
+                outputPath = "output_images/" + suffix + ".bmp";
             }
         };
 

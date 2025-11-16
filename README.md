@@ -22,7 +22,7 @@ This branch contains the Windows-focused build of the Task 2 image-processing CL
 ## Running the CLI
 Run commands through `cmd` (or prefix arguments with `--%` in PowerShell) so `-input=` style switches pass through:
 ```powershell
-cmd /c "cd /d d:\image_processing\build && imageProcessor.exe --hpower -input=..\images\Gray\lena.bmp -output=..\output\lena_hpower.bmp"
+cmd /c "cd /d d:\image_processing\build && imageProcessor.exe --hpower -input=..\images\Gray\lena.bmp"
 ```
 ### Histogram (H4)
 - `--hpower -gmin=0 -gmax=255`
@@ -38,7 +38,7 @@ cmd /c "cd /d d:\image_processing\build && imageProcessor.exe --hpower -input=..
 - `--orosenfeld -P=1|2|4|8|16`
 
 Notes:
-- Outputs default to BMP files; directories are created automatically. When running from the `build` directory, prefix outputs with `..\` to land inside the repo (e.g., `-output=..\output\result`).
+- Outputs default to `output_images/<command>.bmp`. These directories are created automatically. When running from the `build` directory, prefix explicit outputs with `..\` to land inside the repo (e.g., `-output=..\output_images\result`).
 - Channel indices are 0-based (`-channel=0` is the first channel).
 
 ## Notes
