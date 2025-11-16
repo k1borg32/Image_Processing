@@ -1,53 +1,51 @@
-# Compiler settings for macOS
-CXX := clang++
-CXXFLAGS := -std=c++11 -O2 -Wall -Wextra
-INCLUDES := -Isrc
-
-# macOS doesn't need special display libraries for BMP files
-# CImg is header-only, so no linking required for basic BMP support
-LIBS := 
-
-# Source files
-SOURCES := src/main.cpp \
-           src/Utils.cpp \
-           src/ImageProcessor.cpp \
-           src/Operations.cpp \
-           src/Geometric.cpp \
-           src/NoiseFilters.cpp \
-           src/Metrics.cpp
-
-# Output target
-TARGET := build/imageProcessor
 BUILD_DIR := build
+TARGET_NAME := imageProcessor
+SOURCES := src/main.cpp \
+           src/Histogram.cpp \
+           src/LinearFilters.cpp \
+           src/NonLinearFilters.cpp \
+           src/Utils.cpp
+INCLUDES := -Isrc
+CXXFLAGS := -std=gnu++11 -O2 -Wall -Wextra
 
-# Build target
+ifeq ($(OS),Windows_NT)
+    EXE := .exe
+    CXX := g++
+    TARGET := $(BUILD_DIR)/$(TARGET_NAME)$(EXE)
+    MKDIR = if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
+    RMDIR = if exist $(BUILD_DIR) rmdir /S /Q $(BUILD_DIR)
+    LIBS := -lgdi32
+else
+    EXE :=
+    CXX ?= clang++
+    TARGET := $(BUILD_DIR)/$(TARGET_NAME)
+    MKDIR = mkdir -p $(BUILD_DIR)
+    RMDIR = rm -rf $(BUILD_DIR)
+    LIBS :=
+endif
+
+.PHONY: all clean rebuild run help
+
 all: $(TARGET)
 
 $(TARGET): $(SOURCES)
-	@echo "Building image processor..."
-	@mkdir -p $(BUILD_DIR)
+	@$(MKDIR)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(SOURCES) -o $(TARGET) $(LIBS)
-	@echo "Build complete: $(TARGET)"
+	@echo Build complete: $(TARGET)
 
-# Clean
 clean:
-	@rm -rf $(BUILD_DIR)
-	@echo "Clean complete"
+	@$(RMDIR)
+	@echo Clean complete
 
-# Rebuild
 rebuild: clean all
 
-# Run the program (example)
 run: $(TARGET)
-	./$(TARGET) --help
+	$(TARGET) --help
 
-# Help
 help:
-	@echo "Available targets:"
-	@echo "  make          - Build the project"
-	@echo "  make clean    - Remove compiled binary"
-	@echo "  make rebuild  - Clean and rebuild"
-	@echo "  make run      - Build and run with --help"
-	@echo "  make help     - Show this message"
-
-.PHONY: all clean rebuild run help
+	@echo Available targets:
+	@echo   make          - Build the project
+	@echo   make clean    - Remove compiled binary
+	@echo   make rebuild  - Clean and rebuild
+	@echo   make run      - Build and run with --help
+	@echo   make help     - Show this message
