@@ -1,29 +1,20 @@
-#include "Histogram.h"
-#include "LinearFilters.h"
-#include "NonLinearFilters.h"
-#include <iomanip> 
+#include "Utils.h"
+#include "Morphology.h"
+#include "Segmentation.h"
 #include <iostream>
 #include <string>
 
-using namespace std;
-
 void printHelp() {
-    cout << "Image Processing - Task 2\n";
-    cout << "Usage: ./imageProcessor --command -input=file -output=file [options]\n\n";
-    cout << "Commands:\n";
-    cout << "  --hpower         : Apply H4 power 2/3 histogram equalization\n";
-    cout << "  --histogram      : Save histogram as image\n";
-    cout << "  --characteristics: Print all image characteristics (C1-C6)\n";
-    cout << "  --sedgesharp     : Apply edge sharpening (S2)\n";
-    cout << "                     Options: -variant=1,2,3 or -optimized\n";
-    cout << "  --orosenfeld     : Apply Rosenfeld operator (O5)\n";
-    cout << "                     Options: -P=1,2,4,8,16\n";
-    cout << "\nOptions:\n";
-    cout << "  -input=PATH      : Input image file\n";
-    cout << "  -output=PATH     : Output image file\n";
-    cout << "  -channel=N       : Channel for histogram (0,1,2)\n";
-    cout << "  -gmin=N          : Min value for histogram (default: 0)\n";
-    cout << "  -gmax=N          : Max value for histogram (default: 255)\n";
+    std::cout << "Task 3: Morphology and Segmentation\n";
+    std::cout << "Usage: ./task3 --command -input=file [options]\n\n";
+    std::cout << "Commands:\n";
+    std::cout << "  --morph         : Apply morphological operations\n";
+    std::cout << "    -op=NAME      : dilate, erode, open, close, thin\n";
+    std::cout << "    -elem=TYPE    : square (default), cross\n";
+    std::cout << "  --segment       : Apply Region Growing segmentation (R1)\n";
+    std::cout << "    -seed=X,Y     : Seed point coordinates (e.g., -seed=100,100)\n";
+    std::cout << "    -thresh=VAL   : Color distance threshold (default: 40)\n";
+    std::cout << "  --help          : Show this help\n";
 }
 
 int main(int argc, char* argv[]) {
@@ -31,116 +22,97 @@ int main(int argc, char* argv[]) {
         printHelp();
         return 0;
     }
+
+    std::string command;
+    std::string inputPath; 
+    std::string outputPath = "out.bmp";
     
-    string command, inputPath, outputPath;
-    int channel = 0, gmin = 0, gmax = 255, variant = 1, P = 1;
-    bool optimized = false;
+    // Default Parameters
+    std::string morphOp = "dilate";
+    std::string structElem = "square";
+    int seedX = 0, seedY = 0;
+    int segThresh = 40; // Default threshold suitable for Euclidean color distance
     
-    // Parse arguments
+    // Parse args
     for (int i = 1; i < argc; ++i) {
-        string arg = argv[i];
+        std::string arg = argv[i];
         
-        if (arg == "--help") {
-            printHelp();
-            return 0;
-        }
-        else if (arg.find("--") == 0) {
-            command = arg;
-        }
-        else if (arg.find("-input=") == 0) {
-            inputPath = arg.substr(7);
-        }
-        else if (arg.find("-output=") == 0) {
-            outputPath = arg.substr(8);
-        }
-        else if (arg.find("-channel=") == 0) {
-            channel = stoi(arg.substr(9));
-        }
-        else if (arg.find("-gmin=") == 0) {
-            gmin = stoi(arg.substr(6));
-        }
-        else if (arg.find("-gmax=") == 0) {
-            gmax = stoi(arg.substr(6));
-        }
-        else if (arg.find("-variant=") == 0) {
-            variant = stoi(arg.substr(9));
-        }
-        else if (arg.find("-P=") == 0) {
-            P = stoi(arg.substr(3));
-        }
-        else if (arg == "-optimized") {
-            optimized = true;
-        }
-    }
-    
-    if (inputPath.empty()) {
-        cerr << "Error: No input file specified\n";
-        return 1;
-    }
-    
-    try {
-        // Load image
-        CImg<unsigned char> img(inputPath.c_str());
-        cout << "Loaded: " << inputPath << " (" << img.width() << "x" 
-             << img.height() << ", " << img.spectrum() << " channels)\n";
-        
-        CImg<unsigned char> result;
-        
-        // Process based on command
-        if (command == "--hpower") {
-            result = histogram_power23(img, gmin, gmax);
-            cout << "Applied power 2/3 histogram equalization\n";
-        }
-        else if (command == "--histogram") {
-            auto hist = compute_histogram(img, channel);
-            save_histogram_image(hist, outputPath);
-            return 0;
-        }
-        else if (command == "--characteristics") {
-            auto ch = compute_characteristics(img, channel);
-            cout << fixed << setprecision(4);
-            cout << "\nImage Characteristics (Channel " << channel << "):\n";
-            cout << "  Mean (C1):              " << ch.mean << "\n";
-            cout << "  Variance (C1):          " << ch.variance << "\n";
-            cout << "  Std Deviation (C2):     " << ch.stdev << "\n";
-            cout << "  Var Coefficient I (C2): " << ch.varcoeff_I << "\n";
-            cout << "  Asymmetry (C3):         " << ch.asymmetry << "\n";
-            cout << "  Flattening (C4):        " << ch.flattening << "\n";
-            cout << "  Var Coefficient II (C5):" << ch.varcoeff_II << "\n";
-            cout << "  Entropy (C6):           " << ch.entropy << " bits\n";
-            return 0;
-        }
-        else if (command == "--sedgesharp") {
-            if (optimized) {
-                result = edge_sharpen_optimized(img);
-                cout << "Applied optimized edge sharpening\n";
-            } else {
-                if (variant == 1) result = edge_sharpen_type1(img);
-                else if (variant == 2) result = edge_sharpen_type2(img);
-                else if (variant == 3) result = edge_sharpen_type3(img);
-                cout << "Applied edge sharpening (variant " << variant << ")\n";
+        if (arg == "--help") { printHelp(); return 0; }
+        else if (arg.find("--") == 0) command = arg;
+        else if (arg.find("-input=") == 0) inputPath = arg.substr(7);
+        else if (arg.find("-output=") == 0) outputPath = arg.substr(8);
+        else if (arg.find("-op=") == 0) morphOp = arg.substr(4);
+        else if (arg.find("-elem=") == 0) structElem = arg.substr(6);
+        else if (arg.find("-seed=") == 0) {
+            std::string coords = arg.substr(6);
+            size_t comma = coords.find(',');
+            if (comma != std::string::npos) {
+                seedX = std::stoi(coords.substr(0, comma));
+                seedY = std::stoi(coords.substr(comma + 1));
             }
         }
-        else if (command == "--orosenfeld") {
-            result = rosenfeld_operator(img, P);
-            cout << "Applied Rosenfeld operator (P=" << P << ")\n";
-        }
-        else {
-            cerr << "Unknown command: " << command << "\n";
-            return 1;
-        }
-        
-        // Save result
-        if (outputPath.empty()) {
-            outputPath = "output.bmp";
-        }
-        result.save(outputPath.c_str());
-        cout << "Saved: " << outputPath << "\n";
-        
-    } catch (const exception& e) {
-        cerr << "Error: " << e.what() << "\n";
+        else if (arg.find("-thresh=") == 0) segThresh = std::stoi(arg.substr(8));
+    }
+
+    if (inputPath.empty()) {
+        std::cerr << "Error: No input file specified.\n";
         return 1;
     }
-    
+
+    try {
+        CImg<unsigned char> img(inputPath.c_str());
+        CImg<unsigned char> result;
+
+        if (command == "--morph") {
+            // Task 3 requires binary images for standard morphology
+            // We threshold at 128 to get 0 or 255
+            CImg<unsigned char> bin = binarize(img);
+            
+            StructElement se = (structElem == "cross") ? 
+                               StructElement::createCross3x3() : 
+                               StructElement::createSquare3x3();
+            
+            if (morphOp == "dilate") result = morph_dilation(bin, se);
+            else if (morphOp == "erode") result = morph_erosion(bin, se);
+            else if (morphOp == "open") result = morph_opening(bin, se);
+            else if (morphOp == "close") result = morph_closing(bin, se);
+            else if (morphOp == "thin") result = morph_thinning(bin);
+            else {
+                std::cerr << "Unknown op: " << morphOp << std::endl;
+                return 1;
+            }
+        }
+        else if (command == "--segment") {
+            // Region growing uses the original intensity/color values
+            // Returns a mask (255 for region, 0 for background)
+            CImg<unsigned char> mask = region_growing(img, seedX, seedY, segThresh);
+            
+            // Visualization: Overlay Red on the original image
+            result = img;
+            // Ensure result has 3 channels (RGB) even if input was grayscale
+            if (result.spectrum() == 1) result.resize(result.width(), result.height(), 1, 3);
+            
+            cimg_forXY(mask, x, y) {
+                if (mask(x, y) == 255) {
+                    // Make it bright red (R=255, G=0, B=0)
+                    result(x, y, 0) = 255; 
+                    result(x, y, 1) = 0;   
+                    result(x, y, 2) = 0;
+                }
+            }
+        }
+        else {
+            std::cerr << "Unknown command. Use --morph or --segment.\n";
+            return 1;
+        }
+
+        result.save(outputPath.c_str());
+        std::cout << "Saved to " << outputPath << std::endl;
+
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
+
     return 0;
 }

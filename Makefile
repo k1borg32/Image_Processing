@@ -1,53 +1,27 @@
-# Compiler settings for macOS
-CXX := clang++
-CXXFLAGS := -std=c++11 -O2 -Wall -Wextra
-INCLUDES := -Isrc
+CXX = g++
+# Removed -lX11 since we are using cimg_display 0 (No GUI)
+# Added -lm for math library, though usually implicit
+LDFLAGS = -lpthread -lm 
 
-# macOS doesn't need special display libraries for BMP files
-# CImg is header-only, so no linking required for basic BMP support
-LIBS := 
+# Flags: O2 for optimization, C++11 standard
+CXXFLAGS = -O2 -std=c++11 -pthread
 
 # Source files
-SOURCES := src/main.cpp \
-           src/Utils.cpp \
-           src/ImageProcessor.cpp \
-           src/Operations.cpp \
-           src/Geometric.cpp \
-           src/NoiseFilters.cpp \
-           src/Metrics.cpp
+SRCS = src/main.cpp src/Morphology.cpp src/Segmentation.cpp
 
-# Output target
-TARGET := build/imageProcessor
-BUILD_DIR := build
+# Object files
+OBJS = $(SRCS:.cpp=.o)
 
-# Build target
+# Executable name
+TARGET = task3
+
 all: $(TARGET)
 
-$(TARGET): $(SOURCES)
-	@echo "Building image processor..."
-	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) $(SOURCES) -o $(TARGET) $(LIBS)
-	@echo "Build complete: $(TARGET)"
+$(TARGET): $(OBJS)
+	$(CXX) $(OBJS) -o $(TARGET) $(LDFLAGS)
 
-# Clean
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
 clean:
-	@rm -rf $(BUILD_DIR)
-	@echo "Clean complete"
-
-# Rebuild
-rebuild: clean all
-
-# Run the program (example)
-run: $(TARGET)
-	./$(TARGET) --help
-
-# Help
-help:
-	@echo "Available targets:"
-	@echo "  make          - Build the project"
-	@echo "  make clean    - Remove compiled binary"
-	@echo "  make rebuild  - Clean and rebuild"
-	@echo "  make run      - Build and run with --help"
-	@echo "  make help     - Show this message"
-
-.PHONY: all clean rebuild run help
+	rm -f src/*.o $(TARGET)
