@@ -111,8 +111,18 @@ int main(int argc, char* argv[]) {
         // shift so DC is at center
         ComplexMatrix spectrumShifted = fft_shift(spectrum);
         
-        // save magnitude spectrum if requested
-        if (!spectrumPath.empty()) {
+        // auto-generate spectrum path if not specified
+        if (spectrumPath.empty()) {
+            size_t dotPos = outputPath.rfind('.');
+            if (dotPos != std::string::npos) {
+                spectrumPath = outputPath.substr(0, dotPos) + "_spectrum" + outputPath.substr(dotPos);
+            } else {
+                spectrumPath = outputPath + "_spectrum.bmp";
+            }
+        }
+        
+        // save magnitude spectrum
+        {
             std::vector<double> magSpec(N * M);
             get_magnitude_spectrum(spectrumShifted, magSpec.data(), M, N, true);
             
@@ -161,8 +171,16 @@ int main(int argc, char* argv[]) {
             return 1;
         }
         
-        // save mask if requested (only for non-phase filters)
-        if (!maskPath.empty() && !isPhaseFilter) {
+        // auto-save mask for non-phase filters
+        if (!isPhaseFilter) {
+            if (maskPath.empty()) {
+                size_t dotPos = outputPath.rfind('.');
+                if (dotPos != std::string::npos) {
+                    maskPath = outputPath.substr(0, dotPos) + "_mask" + outputPath.substr(dotPos);
+                } else {
+                    maskPath = outputPath + "_mask.bmp";
+                }
+            }
             CImg<unsigned char> maskImg(M, N, 1, 1);
             for (size_t y = 0; y < N; y++) {
                 for (size_t x = 0; x < M; x++) {
@@ -176,6 +194,29 @@ int main(int argc, char* argv[]) {
         // apply filter
         std::cout << "[FFT] Applying filter..." << std::endl;
         ComplexMatrix filtered = apply_filter(spectrumShifted, mask);
+        
+        // save filtered spectrum
+        {
+            std::string filteredSpecPath;
+            size_t dotPos = outputPath.rfind('.');
+            if (dotPos != std::string::npos) {
+                filteredSpecPath = outputPath.substr(0, dotPos) + "_filtered_spectrum" + outputPath.substr(dotPos);
+            } else {
+                filteredSpecPath = outputPath + "_filtered_spectrum.bmp";
+            }
+            
+            std::vector<double> magSpec(N * M);
+            get_magnitude_spectrum(filtered, magSpec.data(), M, N, true);
+            
+            CImg<unsigned char> specImg(M, N, 1, 1);
+            for (size_t y = 0; y < N; y++) {
+                for (size_t x = 0; x < M; x++) {
+                    specImg(x, y) = (unsigned char)magSpec[y * M + x];
+                }
+            }
+            specImg.save(filteredSpecPath.c_str());
+            std::cout << "[FFT] Filtered spectrum saved to " << filteredSpecPath << std::endl;
+        }
         
         // shift back
         ComplexMatrix filteredUnshifted = fft_shift(filtered);
